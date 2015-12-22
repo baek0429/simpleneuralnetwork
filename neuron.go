@@ -43,12 +43,29 @@ type Layer struct {
 	Neurons []*Neuron
 }
 
+// enter point of input
 type Enter struct {
 	OutSynapses []*Synapse
 	Input       float64
 }
 
+// enter has list of neurons in a layer enter -> neurons in a layer with 0 weight
+func (e *Enter) ConnectTo(layer *Layer) {
+	for _, n := range layer.Neurons {
+		e.SynapseTo(n, 0)
+	}
+}
+
+// connect to a single neuron, applied above
 func (e *Enter) SynapseTo(nTo *Neuron, weight float64) {
 	syn := &Synapse{Weight: weight}
 	e.OutSynapses = append(e.OutSynapses, syn)
+	nTo.InSynapses = append(nTo.InSynapses, syn)
+}
+
+// signal from output synapses to neurons with weight
+func (e *Enter) Signal() {
+	for _, s := range e.OutSynapses {
+		s.Signal(e.Input)
+	}
 }
